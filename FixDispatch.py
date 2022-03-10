@@ -2,7 +2,7 @@ import os
 import zipfile
 import pandas
 import shutil
-git checkout - - orphan
+
 # Extract zip files in Fix_Dispatch
 def unzip(file, folder):
     with zipfile.ZipFile(file, "r") as zipref:
