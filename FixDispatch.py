@@ -3,6 +3,7 @@ import zipfile
 import pandas
 import shutil
 
+
 # Extract zip files in Fix_Dispatch
 def unzip(file, folder):
     with zipfile.ZipFile(file, "r") as zipref:
@@ -36,7 +37,6 @@ def apply_fix():
         print(f"\n Fixing {folder} Modules")
         print("-" * 50)
         for file in files:
-            file_directory = f"{cwd}{folder}/{file}"
             for module in module_obj:
                 if module["Module"] in file:
                     formatted_name = module["Proper Name"]
@@ -53,5 +53,3 @@ def apply_fix():
         os.chdir(cwd)
         shutil.make_archive(cwd + folder, "zip", cwd + folder)
         shutil.rmtree(cwd + folder)
-
-
