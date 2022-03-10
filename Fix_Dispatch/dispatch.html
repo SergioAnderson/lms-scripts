@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!--/* Copyright � 2003-2017 Rustici Software, LLC  All Rights Reserved. */-->
+<html>
+<head>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Rustici Software Dispatch</title>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script src="configuration.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        if (window.location.protocol === "https:") {
+            DispatchRoot = DispatchRoot.replace("http:", "https:");
+        }
+        else {
+            DispatchRoot = DispatchRoot.replace("https:", "http:");
+        }
+
+        include_script(DispatchRoot + "scormdriver.js");
+        include_script(DispatchRoot + "dispatch.client.loader.js");
+
+        function DispatchStart () {
+            if (typeof Start !== "undefined" && typeof LoadContent !== "undefined") {
+                strLMSStandard = "SCORM";
+
+                if (typeof ShowDebugWindow !== "undefined" && typeof DebugMode !== "undefined" && DebugMode) {
+                    ShowDebugWindow();
+                }
+
+                Start();
+                return;
+            }
+
+            setTimeout("DispatchStart()", 500);
+        }
+
+        function DispatchUnload () {
+            WriteToDebug("In DispatchUnload");
+
+            WriteToDebug("Unloading from DispatchUnload");
+            Unload();
+            WriteToDebug("Unloaded from DispatchUnload");
+        }
+
+        window.addEventListener("message", function(event) {
+            if (event.data == "getData") {
+                return $.getJSON("config.txt").then(function(data) {
+                    event.source.postMessage(data, event.origin)
+                })
+            }
+
+            if (event.data == "aclp_complete") {
+                SetReachedEnd()
+                SetPassed()
+                SetScore(100,100,0)
+                CommitData()
+                console.log("Saved to ACLP with lesson status: passed, and lesson score: 100")
+            }
+
+            if (typeof event.data == "object" && event.data.message == "lms_complete") {
+                var lesson_score = event.data.score
+                SetPassed()
+                SetScore(lesson_score, 100, 0)
+                CommitData()
+                console.log("LMS Completion Sent")
+            }
+
+            if (typeof event.data == "object" && event.data.message == "concede_control") {
+               console.log("unloading dispatch")
+               DispatchUnload()
+            }
+        })
+    </script>
+</head>
+
+<frameset id="dispatch_frameset" rows="0,*" frameborder="0" framespacing="0" border="0" onload="DispatchStart()" onunload="DispatchUnload()">
+    <!-- We set the src to blank.html to avoid security warnings in IE6 / IE7 when launching in HTTPS -->
+    <frame id="dispatch_content_frame" name="dispatch_content_frame" src="blank.html">
+    <frame id="dispatch_loading_frame" name="dispatch_loading_frame" src="blank.html">
+</frameset>
+<noframes>
+    Your browser must be able to view frames for this content to display.
+</noframes>
+
+</html>
