@@ -17,7 +17,8 @@ def apply_fix():
     styles = {
         "applied_interactive_modules": "Applied Interactive",
         "gamified_interactive": "Gamified",
-        "mini_game": "Mini Game"
+        "mini_game": "Mini Game",
+        "developer_interactive": "Developer Interactive"
     }
     style_files = [f for f in os.listdir(cwd) if os.path.isfile(f) and ".zip" in f]
     data = pandas.read_csv("../ssa_modules.csv")
